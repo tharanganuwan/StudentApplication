@@ -1,0 +1,188 @@
+﻿@page
+@model StudentApplication.Pages.Student.UpdateModel
+@{
+}
+
+
+<style type="text/css">
+    .card {
+        width: 60%;
+        margin-left: 20%;
+        margin-top: 5%;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <h2>Edit Student</h2>
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <span class="text-danger">*</span>
+                        <input type="number" class="form-control" id="studentId" placeholder="Ex. 1465" disabled>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <label for="firstName">First Name</label>
+                    <span class="text-danger">*</span>
+                    <input type="text" class="form-control" id="firstName" placeholder="Ex. Nuwan" maxlength="20">
+                    <span class="error text-danger" id="firstNameError"></span>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Ex. kumara" maxlength="20">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date Of Birth</label>
+                        <span class="text-danger">*</span>
+                        <input type="date" class="form-control" id="dateOfBirth">
+                        <span class="error text-danger" id="dateOfBirthError"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="subjects">Subjects</label>
+                        <span class="text-danger">*</span>
+                        <input type="number" class="form-control" id="subjects" placeholder="Ex. 2">
+                        <span class="error text-danger" id="subjectError"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a onclick="UpdateStudent()" class="btn btn-primary">Update</a>
+                <a onclick='GoBack()' class="btn btn-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+
+    function getStudentIdFromURL() {
+        var url = new URL(window.location.href);
+        var studentId = url.searchParams.get("student");
+        return studentId;
+    }
+
+    function GoBack() {
+        window.location.href = '/';
+    }
+
+    $(document).ready(function () {
+        var studentId = getStudentIdFromURL();
+       
+        if (studentId != '' && studentId != null) {
+            $('#studentId').val(studentId);
+
+            $.ajax({
+                type: 'GET',
+                url: 'http://localhost:5205/api/Student/GetStudentById?id=' + studentId,
+                contentType: "appcation/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data != null) {
+                        $('#firstName').val(data.firstName);
+                        $('#lastName').val(data.lastName);
+                        $('#dateOfBirth').val(data.dateOfBirth);
+                        $('#subjects').val(data.numberOfSubjects);
+                    } else {
+                        alert('Somethg is wrong');
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                    alert("Error: " + xhr.responseText);
+                }
+            })
+        }else{
+            alert('Somethg is wrong');
+        }
+        
+    })
+
+    function UpdateStudent() {
+
+        var _student_id = $('#studentId');
+        var _f_name = $('#firstName');
+        var _l_name = $('#lastName');
+        var _dob = $('#dateOfBirth');
+        var _subjects = $('#subjects');
+
+        var student_id = _student_id.val();
+        var f_name = _f_name.val();
+        var l_name = _l_name.val();
+        var dob = _dob.val();
+        var subjects = _subjects.val();
+
+        if (IsDataValid()) {
+
+            var _obj = new Object();
+
+            _obj.firstName = f_name;
+            _obj.lastName = l_name;
+            _obj.dateOfBirth = dob;
+            _obj.numberOfSubjects = subjects;
+
+            $.ajax({
+                type: 'PUT',
+                url: 'http://localhost:5205/api/Student/UpdateStudent?id=' + student_id,
+                data: JSON.stringify(_obj),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (response, textStatus, xhr) {
+                    if (xhr.status === 200) {
+                        console.log('Success:', response.response);
+                        window.location.href = '/';
+                        alert('Success: ' + response.response);
+                    }else{
+                        alert('Somethg is wrong');
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                    alert("Error: " + xhr.responseText);
+                }
+            })
+        }
+
+        function IsDataValid() {
+            var is_valied = true;
+
+            if (f_name == null || f_name == '') {
+                _f_name.css('border-color', 'red');
+                $('#firstNameError').text('First Name is required');
+                is_valied = false;
+            } else {
+                _f_name.css('border-color', '#ccc');
+                $('#firstNameError').text('');
+            }
+            if (dob == null || dob == '') {
+                _dob.css('border-color', 'red');
+                $('#dateOfBirthError').text('Date of Birth is required');
+                is_valied = false;
+            } else {
+                _dob.css('border-color', '#ccc');
+                $('#dateOfBirthError').text('');
+            }
+            if (subjects == null || subjects == '') {
+                _subjects.css('border-color', 'red');
+                $('#subjectError').text('Subjects is required');
+                is_valied = false;
+            } else {
+                _subjects.css('border-color', '#ccc');
+                $('#subjectError').text('');
+            }
+            return is_valied;
+        }
+    }
+</script>
+

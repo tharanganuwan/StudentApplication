@@ -1,0 +1,173 @@
+﻿@page
+@model StudentApplication.Pages.Student.createModel
+@{
+}
+
+<style type="text/css">
+    .card {
+        width: 60%;
+        margin-left: 20%;
+        margin-top: 7%;
+    }
+</style>
+
+<div class="card ">
+    <div class="card-header">
+        <h2>Create Student</h2>
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <span class="text-danger">*</span>
+                        <input type="number" class="form-control" id="studentId" placeholder="Ex. 1452">
+                        <span class="error text-danger" id="studentIdError"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <span class="text-danger">*</span>
+                        <input type="text" class="form-control" id="firstName" placeholder="Ex. Nuwan" maxlength="20">
+                        <span class="error text-danger" id="firstNameError"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Ex. kumara" maxlength="20">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date Of Birth</label>
+                        <span class="text-danger">*</span>
+                        <input type="date" class="form-control" id="dateOfBirth">
+                        <span class="error text-danger" id="dateOfBirthError"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="subjects">Subjects</label>
+                        <span class="text-danger">*</span>
+                        <input type="number" class="form-control" id="subjects" placeholder="Ex. 2" >
+                        <span class="error text-danger" id="subjectError"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer mt-2">
+                <a onclick="SaveStudent()" class="btn btn-primary">Save</a>
+                <a onclick='GoBack()' class="btn btn-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    
+    function GoBack(){
+        window.location.href = '/';
+    }
+
+    function SaveStudent(){
+
+        var _student_id = $('#studentId');
+        var _f_name = $('#firstName');
+        var _l_name = $('#lastName');
+        var _dob = $('#dateOfBirth');
+        var _subjects = $('#subjects');
+
+        var student_id = _student_id.val();
+        var f_name = _f_name.val();
+        var l_name = _l_name.val();
+        var dob = _dob.val();
+        var subjects = _subjects.val();
+
+        if (IsDataValid()) {
+
+            var _obj = new Object();
+
+            _obj.studentId = student_id;
+            _obj.firstName = f_name;
+            _obj.lastName = l_name;
+            _obj.dateOfBirth = dob;
+            _obj.numberOfSubjects = subjects;
+
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:5205/api/Student/CreateStudent',
+                data: JSON.stringify(_obj),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (response, textStatus, xhr) {
+                    if (xhr.status === 200) {
+                        console.log('Success:', response.Response);
+                        window.location.href = '/';
+                        alert('Success: ' + response.response);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                    alert("Error: " + xhr.responseText);
+                }
+            })
+        }
+
+        function IsDataValid() {
+
+            var is_valied = true;
+
+            if (student_id == null || student_id == '') {
+                _student_id.css('border-color', 'red');
+                $('#studentIdError').text('Student ID is required');
+                is_valied = false;
+
+            }
+            else if (student_id < 1000 || student_id > 9999999) {
+                _student_id.css('border-color', 'red');
+                $('#studentIdError').text('Student ID must be at least 4 characters and greater than 1000');
+                is_valied = false;
+            }
+            else {
+                _student_id.css('border-color', '#ccc');
+                $('#studentIdError').text('');
+            }
+            if (f_name == null || f_name == '') {
+                _f_name.css('border-color', 'red');
+                $('#firstNameError').text('First Name is required');
+                is_valied = false;
+            } else {
+                _f_name.css('border-color', '#ccc');
+                $('#firstNameError').text('');
+            }
+            if (dob == null || dob == '') {
+                _dob.css('border-color', 'red');
+                $('#dateOfBirthError').text('Date of Birth is required');
+                is_valied = false;
+            } else {
+                _dob.css('border-color', '#ccc');
+                $('#dateOfBirthError').text('');
+            }
+            if (subjects == null || subjects == '') {
+                _subjects.css('border-color', 'red');
+                $('#subjectError').text('Subjects is required');
+                is_valied = false;
+            }
+            else if (subjects > 100) {
+                _subjects.css('border-color', 'red');
+                $('#subjectError').text('max Subjects 100');
+                is_valied = false;
+            }
+            else {
+                _subjects.css('border-color', '#ccc');
+                $('#subjectError').text('');
+            }
+            return is_valied;
+        }
+    }
+
+</script>

@@ -1,0 +1,115 @@
+﻿@page
+@model StudentApplication.Pages.Student.IndexModel
+@{
+}
+
+
+
+<diV class="card-header mt-5">
+	<h2>Student List</h2>
+</diV>
+<div class="card-body">
+	<div class="card-title mb-2">
+        <a class="btn btn-success" onclick='AddNew()'>Add New Student</a>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+            <table class="table table-bordered" id="tblstudent">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Date of Birth</th>
+                        <th>Subjects</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+		</div>
+	</div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<script type="text/javascript" charset="utf-8" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+
+    var js = jQuery.noConflict(true);
+
+    js(document).ready(function(){
+        LoadStudents();
+    });
+
+    function AddNew()
+    {
+        window.location.href = '/student/create';
+    }
+
+    function LoadStudents() {
+       tabledata=[];
+       $.ajax({
+           type:'GET',
+           url: 'http://localhost:5205/api/Student/GetAllStudents',
+           contentType: "appcation/json; charset=utf-8",
+           dataType: "json",
+           async: false,
+            success: function (data) {
+                $.each(data, function (index, value) {
+                    var _edit = "<a class='btn btn-primary' onclick='FunEdit(this)'>Edit</a>";
+                    var _remove = "<a class='btn btn-danger' onclick='FunRemove(this)'>Remove</a>";
+                    var _hdn = "<input type='hidden' id='hdncode' value=" + value.studentId + " />";
+                    var _action = _hdn + _edit + "  |   " + _remove;
+                    tabledata.push([value.studentId, value.firstName, value.lastName || '-', value.dateOfBirth, value.numberOfSubjects, _action]);
+                });
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.responseText);
+                alert("Error: " + xhr.responseText);
+            }
+        });
+
+        js('#tblstudent').DataTable({
+            data: tabledata
+        })
+    }
+
+    function FunEdit(element) {
+        var studentId = $(element).closest('tr').find('#hdncode').val();
+        window.location.href = '/student/update/?student=' + studentId;
+    }
+
+    function FunRemove(element) {
+        var studentId = $(element).closest('tr').find('#hdncode').val();
+        if (confirm('Do you want to remove?')) {
+            precessremove(studentId);
+        }
+
+        function precessremove(studentId) {
+            $.ajax({
+                type: 'PUT',
+                url: 'http://localhost:5205/api/Student/DeleteStudent?id=' + studentId,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (response, textStatus, xhr) {
+                    if (xhr.status === 200) {
+                        console.log('Success:', response.response);
+                        window.location.href = '/';
+                        alert('Success: ' + response.response);
+                    } else {
+                        alert('Somethg is wrong');
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                    alert("Error: " + xhr.responseText);
+                }
+            })
+        }
+    }
+</script>
+
