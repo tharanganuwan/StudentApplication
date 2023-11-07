@@ -27,9 +27,9 @@ namespace StudentApp.Infrastructure.Repositories
                 SqlParameter[] parameters =
                 {
                     new SqlParameter("@in_id",SqlDbType.Int),
-                    new SqlParameter("@in_f_name",SqlDbType.VarChar),
-                    new SqlParameter("@in_l_name",SqlDbType.VarChar),
-                    new SqlParameter("@in_birthday",SqlDbType.VarChar),
+                    new SqlParameter("@in_f_name",SqlDbType.NVarChar),
+                    new SqlParameter("@in_l_name",SqlDbType.NVarChar),
+                    new SqlParameter("@in_birthday",SqlDbType.Date),
                     new SqlParameter("@in_students",SqlDbType.Int),
                     new SqlParameter("@in_status",SqlDbType.Int),
                     new SqlParameter("@out_result",SqlDbType.Int)
@@ -127,9 +127,9 @@ namespace StudentApp.Infrastructure.Repositories
                 SqlParameter[] parameters =
                 {
                     new SqlParameter("@in_id",SqlDbType.Int),
-                    new SqlParameter("@in_f_name",SqlDbType.VarChar),
-                    new SqlParameter("@in_l_name",SqlDbType.VarChar),
-                    new SqlParameter("@in_birthday",SqlDbType.VarChar),
+                    new SqlParameter("@in_f_name",SqlDbType.NVarChar),
+                    new SqlParameter("@in_l_name",SqlDbType.NVarChar),
+                    new SqlParameter("@in_birthday",SqlDbType.Date),
                     new SqlParameter("@in_students",SqlDbType.Int),
                     new SqlParameter("@in_status",SqlDbType.Int),
                     new SqlParameter("@out_result",SqlDbType.Int)
